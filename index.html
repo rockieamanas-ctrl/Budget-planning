@@ -167,7 +167,7 @@
   <div class="card">
     <div class="form-group">
       <label class="form-label">Amount (€)</label>
-      <input type="number" id="exp-amount" placeholder="0.00" min="0" step="0.01" inputmode="decimal">
+      <input type="text" id="exp-amount" placeholder="0.00" inputmode="decimal">
     </div>
     <div class="form-group">
       <label class="form-label">Category</label>
@@ -205,7 +205,7 @@
   <div class="card">
     <div class="form-group">
       <label class="form-label">Amount (€)</label>
-      <input type="number" id="inc-amount" placeholder="0.00" min="0" step="0.01" inputmode="decimal">
+      <input type="text" id="inc-amount" placeholder="0.00" inputmode="decimal">
     </div>
     <div class="form-group">
       <label class="form-label">Category</label>
@@ -243,7 +243,7 @@
     <div class="sec-title" style="margin-bottom:14px">Update current value</div>
     <div class="form-group">
       <label class="form-label">Current portfolio value (€)</label>
-      <input type="number" id="inv-newval" placeholder="0.00" min="0" step="0.01" inputmode="decimal">
+      <input type="text" id="inv-newval" placeholder="0.00" inputmode="decimal">
     </div>
     <div class="form-group">
       <label class="form-label">Date</label>
@@ -282,11 +282,11 @@
     <div class="card">
       <div class="form-group">
         <label class="form-label">Cash balance (€)</label>
-        <input type="number" id="set-cash" placeholder="0.00" step="0.01" inputmode="decimal">
+        <input type="text" id="set-cash" placeholder="0.00" inputmode="decimal">
       </div>
       <div class="form-group">
         <label class="form-label">Card balance (€)</label>
-        <input type="number" id="set-card" placeholder="0.00" step="0.01" inputmode="decimal">
+        <input type="text" id="set-card" placeholder="0.00" inputmode="decimal">
       </div>
     </div>
   </div>
@@ -296,11 +296,11 @@
     <div class="card">
       <div class="form-group">
         <label class="form-label">Capital invested (€)</label>
-        <input type="number" id="set-inv-capital" placeholder="e.g. 50" step="0.01" inputmode="decimal">
+        <input type="text" id="set-inv-capital" placeholder="e.g. 50" inputmode="decimal">
       </div>
       <div class="form-group">
         <label class="form-label">Current portfolio value (€)</label>
-        <input type="number" id="set-inv-value" placeholder="e.g. 100" step="0.01" inputmode="decimal">
+        <input type="text" id="set-inv-value" placeholder="e.g. 100" inputmode="decimal">
       </div>
       <p class="text-muted" style="margin-bottom:10px">If you have €50 invested and €100 current value, enter 50 and 100.</p>
     </div>
@@ -503,6 +503,7 @@ function calcBalances() {
 
 function fmt(n) { return '€' + (parseFloat(n)||0).toFixed(2); }
 function fmtN(n) { return (parseFloat(n)||0).toFixed(2); }
+function parseAmount(val) { return parseFloat((val||'').toString().replace(',','.')) || 0; }
 
 // ---- NW STRIP ----
 function renderNWStrip() {
@@ -528,7 +529,7 @@ function renderNWStrip() {
 
 // ---- EXPENSES ----
 function addExpense() {
-  const amt = parseFloat(document.getElementById('exp-amount').value);
+  const amt = parseAmount(document.getElementById('exp-amount').value);
   const cat = document.getElementById('exp-cat').value;
   const date = document.getElementById('exp-date').value;
   const note = document.getElementById('exp-note').value.trim();
@@ -552,7 +553,7 @@ function renderExpList(limit=5) {
 
 // ---- INCOME ----
 function addIncome() {
-  const amt = parseFloat(document.getElementById('inc-amount').value);
+  const amt = parseAmount(document.getElementById('inc-amount').value);
   const cat = document.getElementById('inc-cat').value;
   const date = document.getElementById('inc-date').value;
   const note = document.getElementById('inc-note').value.trim();
@@ -600,7 +601,7 @@ function renderInvSummary() {
 }
 
 function updateInvestment() {
-  const val = parseFloat(document.getElementById('inv-newval').value);
+  const val = parseAmount(document.getElementById('inv-newval').value);
   const date = document.getElementById('inv-date').value;
   const note = document.getElementById('inv-note').value.trim();
   if (!val || val < 0) { showToast('Enter a valid value'); return; }
@@ -909,10 +910,10 @@ function deleteCat(type, idx) {
 }
 
 function saveSettings() {
-  state.settings.startCash = parseFloat(document.getElementById('set-cash').value) || 0;
-  state.settings.startCard = parseFloat(document.getElementById('set-card').value) || 0;
-  state.settings.startInvCapital = parseFloat(document.getElementById('set-inv-capital').value) || 0;
-  state.settings.startInvValue = parseFloat(document.getElementById('set-inv-value').value) || 0;
+  state.settings.startCash = parseAmount(document.getElementById('set-cash').value);
+  state.settings.startCard = parseAmount(document.getElementById('set-card').value);
+  state.settings.startInvCapital = parseAmount(document.getElementById('set-inv-capital').value);
+  state.settings.startInvValue = parseAmount(document.getElementById('set-inv-value').value);
   save();
   renderNWStrip();
   renderInvSummary();

@@ -142,6 +142,8 @@
   .tx-amount { font-size: 16px; font-weight: 700; flex-shrink: 0; }
   .tx-amount.expense { color: var(--red); }
   .tx-amount.income { color: var(--green); }
+  .tx-del { background: none; border: none; color: var(--text3); font-size: 16px; cursor: pointer; padding: 4px 6px; border-radius: 6px; flex-shrink: 0; }
+  .tx-del:hover { color: var(--red); background: rgba(139,46,46,0.08); }
   .tx-note { font-size: 11px; color: var(--text3); font-style: italic; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
   /* SECTION HEADER */
@@ -705,7 +707,19 @@ function renderInvList() {
         ${u.note ? `<div class="tx-note">${u.note}</div>` : ''}
       </div>
       <div class="tx-amount income">${fmt(u.value)}</div>
+      <button class="tx-del" onclick="deleteInvUpdate(${u.id})" title="Delete">✕</button>
     </div>`).join('');
+}
+
+function deleteInvUpdate(id) {
+  if (!confirm('Delete this investment update?')) return;
+  state.investmentUpdates = state.investmentUpdates.filter(u => u.id !== id);
+  save();
+  renderInvSummary();
+  renderInvList();
+  renderNWStrip();
+  renderStats();
+  showToast('Update removed');
 }
 
 // ---- TX ROW ----
@@ -727,7 +741,29 @@ function txRow(e, type) {
       ${e.note ? `<div class="tx-note">${e.note}</div>` : ''}
     </div>
     <div class="tx-amount ${type}">${sign}${fmt(e.amount)}</div>
+    <button class="tx-del" onclick="deleteTransaction(${e.id},'${type}')" title="Delete">✕</button>
   </div>`;
+}
+
+function deleteTransaction(id, type) {
+  if (!confirm('Delete this transaction? This cannot be undone.')) return;
+  if (type === 'expense') {
+    state.expenses = state.expenses.filter(e => e.id !== id);
+  } else {
+    state.incomes = state.incomes.filter(e => e.id !== id);
+  }
+  save();
+  renderNWStrip();
+  renderExpList();
+  renderIncList();
+  renderStats();
+  renderInvSummary();
+  // refresh modal list if open
+  const modal = document.getElementById('all-tx-modal');
+  if (modal.classList.contains('open')) {
+    showAllTransactions(type);
+  }
+  showToast('Transaction removed');
 }
 
 // ---- ALL TRANSACTIONS MODAL ----
